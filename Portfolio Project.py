@@ -100,7 +100,7 @@ while True:
     if response.status_code == 200:
         # parse the json
         dict_from_json = json.loads(response.text)
-        # print(dict_from_json["hits"])
+        # print(dict_from_json["hits"]) # used to see the response hast table
         if not dict_from_json["hits"]:
             print(f"\033[1m\033[91mYour search for {ingredients} found no recipes, please try again.\033[0m")
             exit(1)
@@ -111,12 +111,16 @@ while True:
 
         for i, recipe_data in enumerate(selected_data["hits"], start=1):
             recipe = recipe_data["recipe"]
+            recipe_url = recipe["url"]
             recipe_name = recipe["label"]
             ingredients = recipe_data["recipe"]["ingredientLines"]
 
             print(f"Recipe{i}: {recipe_name}")
-            for j, ingredient in enumerate(ingredients, start=1):
-                print(f"  Ingredient{j}: {ingredient}")
+            print(f"Url: {recipe_url}")
+            # for j, ingredient in enumerate(ingredients, start=1):
+                # print(f"  Ingredient{j}: {ingredient}")
+            for ingredient in ingredients:
+                print(f"  {ingredient}")
 
     else:
         print("API request failed with status code: ", response.status_code)
