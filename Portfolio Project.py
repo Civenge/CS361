@@ -2,6 +2,7 @@ import json
 import requests
 import random
 from art import *
+import webbrowser
 
 #api here: https://developer.edamam.com//admin/applications/1409623863337
 #api doc: https://developer.edamam.com/edamam-docs-recipe-api
@@ -39,7 +40,15 @@ def remove_str_chars(input_string, x):
     else:
         return input_string
 
-user_input = input().lower();
+def process_food_list(input_string):
+    request_string = ""
+    for food in input_string:
+        request_string = request_string + food + "%2c%20"
+    # remove the last %2c%20 from the collated string which is unicode for ", "
+    formatted_string = remove_str_chars(request_string, 6)
+    return formatted_string
+
+user_input = input().lower()
 if user_input == "yes" or user_input == "y":
     print("This is a program that will take in 5 inputs from a user to help you find a recipe.")
     print("The first input will be a list of ingredients that you want to include, separated by commas.")
@@ -51,15 +60,30 @@ if user_input == "yes" or user_input == "y":
     print("Let's get started!")
 
 print("\n")
+
+browse_recipes = input("Would you like to search for recipes or browse for recipes? Type 'search' or 'browse'\n").lower()
+if browse_recipes == "browse":
+    url = "https://www.allrecipes.com/"
+    webbrowser.open(url)
+    print("Enjoy your browsing, goodbye!")
+    exit(0)
+
 while True:
     food_list = None
     while food_list is None:
         ingredients = input("What ingredients do you want to use (chicken, cheese, etc)?\n")
         if ingredients:
             food_list = argument_handler(ingredients)
+            formatted_string = process_food_list(food_list)
+            test_response = requests.get("https://api.edamam.com/api/recipes/v2?type=public&q=" + formatted_string + "&app_id=2286dd85&app_key=1cdfcd395ccf99e349b18f54eaa4416f&random=true&field=url&field=label&field=ingredientLines")
+            dict_from_json = json.loads(test_response.text)
+            if not dict_from_json["hits"]:
+                print(f"\033[1m\033[91mYour search for {ingredients} found no recipes, please try again.\033[0m")
+                food_list = None
         else:
             print("Please select at least one ingredient.\n")
     # print(food_list)
+
 
     num_recipes = None
     while num_recipes is None:
@@ -72,12 +96,13 @@ while True:
         recipe_count = ""
         num_recipes = None
 
-    request_string = ""
-    for food in food_list:
-        request_string = request_string + food + "%2c%20"
-
-    # remove the last %2c%20 from the collated string which is unicode for ", "
-    formatted_string = remove_str_chars(request_string, 6)
+    # request_string = ""
+    # for food in food_list:
+    #     request_string = request_string + food + "%2c%20"
+    #
+    # # remove the last %2c%20 from the collated string which is unicode for ", "
+    # formatted_string = remove_str_chars(request_string, 6)
+    formatted_string = process_food_list(food_list)
 
     excluded_ingredients_str = input("Please type out any ingredients you want excluded from the list (rice, bread), or press Enter to skip.\n")
     excluded_ingredients_list = argument_handler(excluded_ingredients_str)
