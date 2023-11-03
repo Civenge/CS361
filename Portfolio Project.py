@@ -21,9 +21,10 @@ Flow:
 tprint("Meal Planner")
 # unicode is for italics and green
 print("\033[3m\033[92mThis program will take approximately 30 seconds to complete for a single recipe.\033[0m")
-print("* Use this program to pick out recipes and make a shopping list of ingredients!")
+print("* Use this program to pick out recipes and save a list of new recipes to try!")
 print("* Start by inputting some ingredients that you want to use to find a recipe.")
-print("* Would you like more information about this program prior to starting the search?. (Yes or No)\n")
+print("* There will be an opportunity to export any saved recipes at the end of the search.")
+print("* Would you like more information about this program prior to starting the search? (Yes or No)\n")
 
 def argument_handler(*args):
     if not args:
@@ -40,11 +41,13 @@ def remove_str_chars(input_string, x):
 
 user_input = input().lower();
 if user_input == "yes" or user_input == "y":
-    print("This is a program that will take in 4 inputs from a user to help you find a recipe.")
+    print("This is a program that will take in 5 inputs from a user to help you find a recipe.")
     print("The first input will be a list of ingredients that you want to include, separated by commas.")
     print("Then the program will ask for how many recipes you want to see, between 1 and 20.")
     print("The next input will be an ingredient that you want to exclude, or you can leave it blank.")
-    print("Finally, once you have your recipe output, you can choose whether to add the recipe to a shopping list.")
+    print("Then you can choose which recipe results you want to save based on the displayed recipe number.")
+    print("Finally, you will have the option to do another search and save even more recipes, or get the results")
+    print("  to download as a word document.")
     print("Let's get started!")
 
 print("\n")
