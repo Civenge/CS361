@@ -153,11 +153,11 @@ while True:
     else:
         print("API request failed with status code: ", response.status_code)
 
-    ask_add_to_shopping_list = input("Would you like to add this recipe to your shopping list? (Yes or No)\n")
+    ask_add_to_shopping_list = input("Would you like to add any of these recipes to your saved recipes? (Yes or No)\n")
     if ask_add_to_shopping_list.lower() == "y" or ask_add_to_shopping_list.lower() == "yes":
-        print("Adding ingredients to shopping list")
+        print("Adding recipes to saved recipes")
         print("<<<<this is where my partner's microservice would do stuff>>>>\n")
-    ask_another_recipe = input("Would you like to add another recipe? (Yes or No)\n")
+    ask_another_recipe = input("Would you like to search for another recipe? (Yes or No)\n")
     if ask_another_recipe.lower() == "y" or ask_another_recipe.lower() == "yes":
         continue
     else:
