@@ -155,8 +155,20 @@ while True:
 
     ask_add_to_shopping_list = input("Would you like to add any of these recipes to your saved recipes? (Yes or No)\n")
     if ask_add_to_shopping_list.lower() == "y" or ask_add_to_shopping_list.lower() == "yes":
-        print("Adding recipes to saved recipes")
-        print("<<<<this is where my partner's microservice would do stuff>>>>\n")
+
+        while True:
+            ask_add_which_recipes = input("What recipes would you like to save? (Ex: 1, 2, 4)\n")
+            current_saved_recipe_list = list(ask_add_which_recipes)
+            integer_list = [x for x in current_saved_recipe_list if x.isdigit()]
+
+            if len(integer_list) <= num_recipes and int(max(integer_list)) <= num_recipes:
+                print(f"Here is what you selected: {integer_list}\n")
+                print("Adding recipes to saved recipes\n")
+                print("<<<<this is where my partner's microservice would do stuff>>>>\n")
+                break
+            else:
+                print(f"Please select less recipes and make sure every selection is valid.")
+
     ask_another_recipe = input("Would you like to search for another recipe? (Yes or No)\n")
     if ask_another_recipe.lower() == "y" or ask_another_recipe.lower() == "yes":
         continue
