@@ -160,14 +160,22 @@ while True:
             ask_add_which_recipes = input("What recipes would you like to save? (Ex: 1, 2, 4)\n")
             current_saved_recipe_list = list(ask_add_which_recipes)
             integer_list = [x for x in current_saved_recipe_list if x.isdigit()]
+            for idx in range(len(integer_list)):
+                integer_list[idx] = int(integer_list[idx])
 
             if len(integer_list) <= num_recipes and int(max(integer_list)) <= num_recipes:
                 print(f"Here is what you selected: {integer_list}\n")
                 print("Adding recipes to saved recipes\n")
+                new_data = {"hits": []}
+                for idx in range(len(integer_list)):
+                    print(integer_list[idx])
+                    new_data["hits"].append(selected_data["hits"][idx])
+                message = json.dumps(new_data)
+                print(message)
                 print("<<<<this is where my partner's microservice would do stuff>>>>\n")
                 break
             else:
-                print(f"Please select less recipes and make sure every selection is valid.")
+                print(f"Please select less recipes or make sure every selection is valid.")
 
     ask_another_recipe = input("Would you like to search for another recipe? (Yes or No)\n")
     if ask_another_recipe.lower() == "y" or ask_another_recipe.lower() == "yes":
