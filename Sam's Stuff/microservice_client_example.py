@@ -48,9 +48,5 @@ with open(response_filename, 'wb') as response_file:
 
 print(f"Received data saved to {response_filename}")
 
-# # Receive the response from the server
-# message = client_socket.recv(1024).decode('utf-8')
-# print(f"Server says: {message}")
-
-# Close the socket
+# close the socket
 client_socket.close()

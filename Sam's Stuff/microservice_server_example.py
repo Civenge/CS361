@@ -3,7 +3,6 @@ import socket
 import json
 import matplotlib.pyplot as plt
 from docx import Document
-import io
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -19,7 +18,7 @@ while True:
     print(f"Connection from {addr}")
 
     try:
-        # Receive data in chunks until the entire message is received
+        # receive data in chunks until the entire message is received
         received_data = b""
         while True:
             chunk = client_socket.recv(1024)
@@ -29,13 +28,13 @@ while True:
             received_data += chunk
             print(f"Received chunk: {len(chunk)} bytes")
 
-        # Decode the received data
+        # decode the received data
         message_in = received_data.decode('utf-8')
         print(f"Message received: {message_in}")
 
-        # Parse the JSON data
+        # parse the JSON data
         data = json.loads(message_in)
-        print(data)
+        # print(data)
 
         # remove all NaN "ss" values
         for item in data:
@@ -49,19 +48,19 @@ while True:
                 if value is not None:
                     item[key] = str(value)
 
-        print(data)
+        # print(data)
         filtered_data = [entry for entry in data if entry["ss"] is not None]
-        print(filtered_data)
+        # print(filtered_data)
 
-        # Extracting the relevant information for plotting
+        # extract the relevant information for plotting
         names = [entry["name"] for entry in filtered_data]
         ss_values = [float(entry["ss"]) for entry in filtered_data]
 
-        # Create a bar graph
+        # create a bar graph
         plt.figure(figsize=(6, 6))
         bars = plt.bar(names, ss_values)
 
-        # Rotate x-axis text
+        # rotate x-axis text
         plt.xticks(rotation=45, ha="right")
 
         plt.xlabel('Names')
@@ -100,14 +99,7 @@ while True:
                     break
                 client_socket.send(chunk)
 
-
-
-
-
-
-        # Send a response back to the client
-        # response_message = "Bar chart created and sent!"
-        # client_socket.send(response_message.encode('utf-8'))
+        # close connection
         client_socket.close()
     except Exception as e:
         print(f"Error processing message: {e}")
