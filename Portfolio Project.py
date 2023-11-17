@@ -92,16 +92,11 @@ while True:
             num_recipes = int(recipe_count)
             if 1 <= num_recipes <= 20:
                 break
-        print("Please pick a number between 1 and 20\n")
+        print(f"\033[1m\033[91mPlease pick a number between 1 and 20.\033[0m\n")
         recipe_count = ""
         num_recipes = None
 
-    # request_string = ""
-    # for food in food_list:
-    #     request_string = request_string + food + "%2c%20"
-    #
-    # # remove the last %2c%20 from the collated string which is unicode for ", "
-    # formatted_string = remove_str_chars(request_string, 6)
+
     formatted_string = process_food_list(food_list)
 
     excluded_ingredients_str = input("Please type out any ingredients you want excluded from the list (rice, bread), or press Enter to skip.\n")
@@ -113,22 +108,13 @@ while True:
     else:
         excluded_ingredients_str = ""
 
-    #response = requests.get("https://api.edamam.com/api/recipes/v2?type=public&q=" + formatted_string + "&app_id=2286dd85&app_key=1cdfcd395ccf99e349b18f54eaa4416f&"+ excluded_ingredients +"random=true&field=label&field=image&field=url&field=ingredientLines")
-    # response = requests.get("https://api.edamam.com/api/recipes/v2?type=public&q=" + formatted_string + "&app_id=2286dd85&app_key=1cdfcd395ccf99e349b18f54eaa4416f&"+ excluded_ingredients_str +"random=true&field=label&field=ingredientLines")
+    # build string for api call
     response = requests.get("https://api.edamam.com/api/recipes/v2?type=public&q=" + formatted_string + "&app_id=2286dd85&app_key=1cdfcd395ccf99e349b18f54eaa4416f&"+ excluded_ingredients_str +"&random=true&field=url&field=label&field=ingredientLines")
-    # response = requests.get("https://api.edamam.com/api/recipes/v2?type=public&q=chicken%2C%20celery&app_id=2286dd85&app_key=1cdfcd395ccf99e349b18f54eaa4416f&excluded=vinegar%2C%20pretzel&random=true&field=uri&field=url&field=ingredientLines&field=ingredients")
-
-    # print(response.status_code)
-
-    # # print(response.text)
-    # dict_from_json = json.loads(response.text)
-    # json_formatted_str = json.dumps(dict_from_json, indent=2)
-    #print(json_formatted_str)
 
     if response.status_code == 200:
         # parse the json
         dict_from_json = json.loads(response.text)
-        # print(dict_from_json["hits"]) # used to see the response hast table
+        # print(dict_from_json["hits"]) # used to see the response hash table
         if not dict_from_json["hits"]:
             print(f"\033[1m\033[91mYour search for {ingredients} found no recipes, please try again.\033[0m")
             exit(1)
@@ -137,6 +123,7 @@ while True:
              "hits": selected_recipes
         }
 
+        # prints out the nicely formatted recipe results
         for i, recipe_data in enumerate(selected_data["hits"], start=1):
             recipe = recipe_data["recipe"]
             recipe_url = recipe["url"]
@@ -156,30 +143,38 @@ while True:
     ask_add_to_shopping_list = input("Would you like to add any of these recipes to your saved recipes? (Yes or No)\n")
     if ask_add_to_shopping_list.lower() == "y" or ask_add_to_shopping_list.lower() == "yes":
 
+        # loop to cover saving recipes
         while True:
             ask_add_which_recipes = input("What recipes would you like to save? (Ex: 1, 2, 4)\n")
             current_saved_recipe_list = list(ask_add_which_recipes)
+
+
+            # removes none number values
             integer_list = [x for x in current_saved_recipe_list if x.isdigit()]
+
+            # converts string numbers to ints
             for idx in range(len(integer_list)):
                 integer_list[idx] = int(integer_list[idx])
 
+            #TODO: add some check here for values less than 1
+            # verifies save choices are valid
             if len(integer_list) <= num_recipes and int(max(integer_list)) <= num_recipes:
                 print(f"Here is what you selected: {integer_list}\n")
                 print("Adding recipes to saved recipes\n")
                 new_data = {"hits": []}
                 for idx in range(len(integer_list)):
-                    print(integer_list[idx])
-                    new_data["hits"].append(selected_data["hits"][idx])
+                    new_data["hits"].append(selected_data["hits"][integer_list[idx] - 1])
                 message = json.dumps(new_data)
                 print(message)
                 print("<<<<this is where my partner's microservice would do stuff>>>>\n")
                 break
             else:
-                print(f"Please select less recipes or make sure every selection is valid.")
+                print(f"\033[1m\033[Please select less recipes or make sure every selection is valid.\033[0m")
 
     ask_another_recipe = input("Would you like to search for another recipe? (Yes or No)\n")
     if ask_another_recipe.lower() == "y" or ask_another_recipe.lower() == "yes":
         continue
     else:
+        #
         print("Goodbye!")
         break
