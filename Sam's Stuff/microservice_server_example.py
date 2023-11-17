@@ -1,5 +1,9 @@
+import math
 import socket
 import json
+import matplotlib.pyplot as plt
+from docx import Document
+import io
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -30,14 +34,80 @@ while True:
         print(f"Message received: {message_in}")
 
         # Parse the JSON data
-        dict_from_json = json.loads(message_in)
-        print(dict_from_json)
+        data = json.loads(message_in)
+        print(data)
+
+        # remove all NaN "ss" values
+        for item in data:
+            for key, value in item.items():
+                if isinstance(value, float) and math.isnan(value):
+                    item[key] = None
+
+        # convert all values to strings
+        for item in data:
+            for key, value in item.items():
+                if value is not None:
+                    item[key] = str(value)
+
+        print(data)
+        filtered_data = [entry for entry in data if entry["ss"] is not None]
+        print(filtered_data)
+
+        # Extracting the relevant information for plotting
+        names = [entry["name"] for entry in filtered_data]
+        ss_values = [float(entry["ss"]) for entry in filtered_data]
+
+        # Create a bar graph
+        plt.figure(figsize=(6, 6))
+        bars = plt.bar(names, ss_values)
+
+        # Rotate x-axis text
+        plt.xticks(rotation=45, ha="right")
+
+        plt.xlabel('Names')
+        plt.ylabel('SS Values')
+        plt.title('SS Values for Different Names')
+
+        # set min value for y-axis
+        plt.ylim(70)
+
+        plt.tight_layout()
+
+
+        # save figure as image
+        image_path = 'bar_chart.png'
+        plt.savefig(image_path)
+        plt.show()
+        plt.close()
+
+        # create word document
+        doc = Document()
+
+        # add heading
+        doc.add_heading('Bar Chart of SS Values', level=1)
+
+        # add saved image
+        doc.add_picture(image_path)
+
+        # save word document
+        doc.save('bar_chart_document.docx')
+
+        # Send the document content back to the client
+        with open('bar_chart_document.docx', 'rb') as docx_file:
+            while True:
+                chunk = docx_file.read(1024)
+                if not chunk:
+                    break
+                client_socket.send(chunk)
+
+
+
 
 
 
         # Send a response back to the client
-        response_message = "Welcome to the test server!"
-        client_socket.send(response_message.encode('utf-8'))
+        # response_message = "Bar chart created and sent!"
+        # client_socket.send(response_message.encode('utf-8'))
         client_socket.close()
     except Exception as e:
         print(f"Error processing message: {e}")
