@@ -149,18 +149,25 @@ while True:
         # loop to cover saving recipes
         while True:
             ask_add_which_recipes = input("What recipes would you like to save? (Ex: 1, 2, 4)\n")
-            current_saved_recipe_list = list(ask_add_which_recipes)
+            current_saved_recipe_list = ask_add_which_recipes.split(', ')
 
+            # removes non number values, but leaves a single negative sign if found (-)
+            integer_list = []
+            for x in current_saved_recipe_list:
+                stripped_x = x.lstrip('-')
+                if stripped_x.isdigit():
+                    integer_list.append(int(x))
 
-            # removes none number values
-            integer_list = [x for x in current_saved_recipe_list if x.isdigit()]
+            # check for negative inputs
+            if int(min(integer_list)) <= 0:
+                print(f"\033[1m\033[91mPlease select more than 0 recipes and make sure every selection is valid.\033[0m")
+                continue
 
             # converts string numbers to ints
-            for idx in range(len(integer_list)):
-                integer_list[idx] = int(integer_list[idx])
+            # for idx in range(len(integer_list)):
+            #     integer_list[idx] = int(integer_list[idx])
 
-            #TODO: add some check here for values less than 1
-            # verifies save choices are valid
+            # verifies save choices are within range and selection isn't greater than recipe count
             if len(integer_list) <= num_recipes and int(max(integer_list)) <= num_recipes:
                 print(f"Here is what you selected: {integer_list}\n")
                 print("Adding recipes to saved recipes\n")
@@ -172,7 +179,7 @@ while True:
                 print("<<<<this is where my partner's microservice would do stuff>>>>\n")
                 break
             else:
-                print(f"\033[1m\033[Please select less recipes or make sure every selection is valid.\033[0m")
+                print(f"\033[1m\033[91mPlease select less recipes or make sure every selection is valid.\033[0m")
 
     ask_another_recipe = input("Would you like to search for another recipe? (Yes or No)\n")
     if ask_another_recipe.lower() == "y" or ask_another_recipe.lower() == "yes":
