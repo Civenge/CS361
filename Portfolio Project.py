@@ -62,11 +62,14 @@ if user_input == "yes" or user_input == "y":
 print("\n")
 
 browse_recipes = input("Would you like to search for recipes or browse for recipes? Type 'search' or 'browse'\n").lower()
-if browse_recipes == "browse":
+if browse_recipes.lower() == "browse" or browse_recipes.lower() == "b":
     url = "https://www.allrecipes.com/"
     webbrowser.open(url)
     print("Enjoy your browsing, goodbye!")
     exit(0)
+
+ingredients = None
+selected_data = None
 
 while True:
     food_list = None
