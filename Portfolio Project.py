@@ -163,10 +163,6 @@ while True:
                 print(f"\033[1m\033[91mPlease select more than 0 recipes and make sure every selection is valid.\033[0m")
                 continue
 
-            # converts string numbers to ints
-            # for idx in range(len(integer_list)):
-            #     integer_list[idx] = int(integer_list[idx])
-
             # verifies save choices are within range and selection isn't greater than recipe count
             if len(integer_list) <= num_recipes and int(max(integer_list)) <= num_recipes:
                 print(f"Here is what you selected: {integer_list}\n")
@@ -177,6 +173,9 @@ while True:
                 message = json.dumps(new_data)
                 print(message)
                 print("<<<<this is where my partner's microservice would do stuff>>>>\n")
+                #TODO Implement the microservice calls
+                #TODO Figure out when/where to call 'close' on microservice
+                #TODO Handle the return list from microservice of [recipes_JSON, ingredients_JSON]
                 break
             else:
                 print(f"\033[1m\033[91mPlease select less recipes or make sure every selection is valid.\033[0m")
@@ -185,6 +184,5 @@ while True:
     if ask_another_recipe.lower() == "y" or ask_another_recipe.lower() == "yes":
         continue
     else:
-        #
         print("Goodbye!")
         break
