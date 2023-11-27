@@ -3,11 +3,20 @@ import requests
 import random
 from art import *
 import webbrowser
+from send_and_receive import TcpConnect
 
 #api here: https://developer.edamam.com//admin/applications/1409623863337
 #api doc: https://developer.edamam.com/edamam-docs-recipe-api
 #requires installation of art via "pip install art" in console
+# -----------------------------------------------------------------------------------------------------------------
+# SETUP TCP CONNECTION WITH TCPCONNECT CLASS
+server_name = 'localhost'
+server_port = 1088
 
+my_session = TcpConnect('User', server_name, server_port)
+my_session.connect()
+
+# -----------------------------------------------------------------------------------------------------------------
 '''
 Flow:
     Ask if they want an explanation
@@ -70,6 +79,7 @@ if browse_recipes.lower() == "browse" or browse_recipes.lower() == "b":
 
 ingredients = None
 selected_data = None
+new_data = {"hits": []}
 
 while True:
     food_list = None
@@ -167,15 +177,17 @@ while True:
             if len(integer_list) <= num_recipes and int(max(integer_list)) <= num_recipes:
                 print(f"Here is what you selected: {integer_list}\n")
                 print("Adding recipes to saved recipes\n")
-                new_data = {"hits": []}
+
                 for idx in range(len(integer_list)):
                     new_data["hits"].append(selected_data["hits"][integer_list[idx] - 1])
-                message = json.dumps(new_data)
-                print(message)
+                # message = json.dumps(new_data)
+                # print(message)
                 print("<<<<this is where my partner's microservice would do stuff>>>>\n")
-                #TODO Implement the microservice calls
-                #TODO Figure out when/where to call 'close' on microservice
-                #TODO Handle the return list from microservice of [recipes_JSON, ingredients_JSON]
+
+
+
+
+
                 break
             else:
                 print(f"\033[1m\033[91mPlease select less recipes or make sure every selection is valid.\033[0m")
@@ -184,5 +196,21 @@ while True:
     if ask_another_recipe.lower() == "y" or ask_another_recipe.lower() == "yes":
         continue
     else:
+        reply = my_session.send_data(new_data)
+        print("Received reply from microservice: ", reply, '\r\n')
+        my_session.end_send()
+        # -----------------------------------------------------------------------------------------------------------------
+        # REQUEST MODIFIED DATA
+        # (will be in form of list, 1st index is total recipes, 2nd is just ingredients)
+        modified_data = my_session.get_mod_data()
+
+        # -----------------------------------------------------------------------------------------------------------------
+        # CLOSE SOCKET AND PRINT OUT RESULTS FOR USER
+        print('Received all recipes list:', '\r\n', modified_data[0], '\r\n')
+        print('Received all ingredients list:', '\r\n', modified_data[1])
+
+        # finally, close the TCP connection
+        my_session.disconnect()
+        # ask_word_doc = input("Would you like the recipes in a Word Document?\n")
         print("Goodbye!")
         break
