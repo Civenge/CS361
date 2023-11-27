@@ -36,6 +36,9 @@ print("* Start by inputting some ingredients that you want to use to find a reci
 print("* There will be an opportunity to export any saved recipes at the end of the search.")
 print("* Would you like more information about this program prior to starting the search? (Yes or No)\n")
 
+# global to store recipes
+new_data = {"hits": []}
+
 def argument_handler(*args):
     if not args:
         return "You need to provide at least 1 argument."
@@ -74,12 +77,27 @@ browse_recipes = input("Would you like to search for recipes or browse for recip
 if browse_recipes.lower() == "browse" or browse_recipes.lower() == "b":
     url = "https://www.allrecipes.com/"
     webbrowser.open(url)
+    reply = my_session.send_data(new_data)
+    # print("Received reply from microservice: ", reply, '\r\n')
+    my_session.end_send()
+    # -----------------------------------------------------------------------------------------------------------------
+    # REQUEST MODIFIED DATA
+    # (will be in form of list, 1st index is total recipes, 2nd is just ingredients)
+    modified_data = my_session.get_mod_data()
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # CLOSE SOCKET AND PRINT OUT RESULTS FOR USER
+    # print('Received all recipes list:', '\r\n', modified_data[0], '\r\n')
+    # print('Received all ingredients list:', '\r\n', modified_data[1])
+
+    # finally, close the TCP connection
+    my_session.disconnect()
     print("Enjoy your browsing, goodbye!")
     exit(0)
 
 ingredients = None
 selected_data = None
-new_data = {"hits": []}
+
 
 while True:
     food_list = None
@@ -159,7 +177,15 @@ while True:
         # loop to cover saving recipes
         while True:
             ask_add_which_recipes = input("What recipes would you like to save? (Ex: 1, 2, 4)\n")
-            current_saved_recipe_list = ask_add_which_recipes.split(', ')
+
+            # remove commas from input
+            split_values = ask_add_which_recipes.split(',')
+
+            # remove whitespace in list
+            current_saved_recipe_list = []
+            for x in split_values:
+                stripped_x = x.strip()
+                current_saved_recipe_list.append(stripped_x)
 
             # removes non number values, but leaves a single negative sign if found (-)
             integer_list = []
@@ -211,6 +237,7 @@ while True:
 
         # finally, close the TCP connection
         my_session.disconnect()
-        # ask_word_doc = input("Would you like the recipes in a Word Document?\n")
+        ask_word_doc = input("Would you like the recipes in a Word Document?\n")
+
         print("Goodbye!")
         break
