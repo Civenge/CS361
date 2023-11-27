@@ -216,6 +216,7 @@ while True:
     if ask_another_recipe.lower() == "y" or ask_another_recipe.lower() == "yes":
         continue
     else:
+        print("*******Processing Request, Please Wait*******")
         reply = my_session.send_data(new_data)
         print("Received reply from microservice: ", reply, '\r\n')
         my_session.end_send()
@@ -233,6 +234,7 @@ while True:
         my_session.disconnect()
         ask_word_doc = input("Would you like the recipes in a Word Document?\n")
         if ask_word_doc.lower() == "yes" or ask_word_doc.lower() == "y":
+
             # verify data exits
             if modified_data[0]:
 
@@ -248,7 +250,14 @@ while True:
                         doc.add_paragraph(f"Recipe Name: {recipe_name}")
                         doc.add_paragraph(f"Recipe Title: {recipe_details['recipe']['label']}")
                         doc.add_paragraph(f"URL: {recipe_details['recipe']['url']}")
-                        doc.add_paragraph(f"Ingredients: {recipe_details['recipe']['ingredientLines']}")
+                        # doc.add_paragraph(f"Ingredients: {recipe_details['recipe']['ingredientLines']}")
+
+                        # add ingredients as bulleted list
+                        doc.add_paragraph(f"Ingredients: ")
+                        for ingredient in recipe_details['recipe']['ingredientLines']:
+                            paragraph = doc.add_paragraph(f"{ingredient}")
+                            paragraph.style = 'List Bullet'
+
                         doc.add_paragraph("\n")
 
                 response_filename = 'Recipes.docx'
