@@ -207,13 +207,6 @@ while True:
 
                 for idx in range(len(integer_list)):
                     new_data["hits"].append(selected_data["hits"][integer_list[idx] - 1])
-                # message = json.dumps(new_data)
-                # print(message)
-                print("<<<<this is where my partner's microservice would do stuff>>>>\n")
-
-
-
-
 
                 break
             else:
@@ -247,20 +240,17 @@ while True:
                 doc = Document()
 
                 # add heading
-                doc.add_heading("Recipes")
+                doc.add_heading("Saved Recipes")
 
-                # # add each recipe to document
-                # for recipe_data in modified_data[0]:
-                #     recipe = recipe_data["recipe"]
-                #     doc.add_heading(recipe["Label"])
-                #
-                #     # add recipe url
-                #     doc.add_paragraph(f'URL: {recipe["url"]}')
-                #
-                #     # add ingredients
-                #     doc.add_heading("Ingredients:")
-                #     for ingredient in recipe['ingredientLines']:
-                #         doc.add_paragraph(ingredient)
+                # add each recipe to document
+                for recipe_data in modified_data[0]:
+                    for recipe_name, recipe_details in recipe_data.items():
+                        doc.add_paragraph(f"Recipe Name: {recipe_name}")
+                        doc.add_paragraph(f"Recipe Title: {recipe_details['recipe']['label']}")
+                        doc.add_paragraph(f"URL: {recipe_details['recipe']['url']}")
+                        doc.add_paragraph(f"Ingredients: {recipe_details['recipe']['ingredientLines']}")
+                        doc.add_paragraph("\n")
+
                 response_filename = 'Recipes.docx'
                 doc.save(response_filename)
 
