@@ -4,6 +4,7 @@ import random
 from art import *
 import webbrowser
 from send_and_receive import TcpConnect
+from docx import Document
 
 #api here: https://developer.edamam.com//admin/applications/1409623863337
 #api doc: https://developer.edamam.com/edamam-docs-recipe-api
@@ -238,6 +239,30 @@ while True:
         # finally, close the TCP connection
         my_session.disconnect()
         ask_word_doc = input("Would you like the recipes in a Word Document?\n")
+        if ask_word_doc.lower() == "yes" or ask_word_doc.lower() == "y":
+            # verify data exits
+            if modified_data[0]:
+
+                # create new document
+                doc = Document()
+
+                # add heading
+                doc.add_heading("Recipes")
+
+                # # add each recipe to document
+                # for recipe_data in modified_data[0]:
+                #     recipe = recipe_data["recipe"]
+                #     doc.add_heading(recipe["Label"])
+                #
+                #     # add recipe url
+                #     doc.add_paragraph(f'URL: {recipe["url"]}')
+                #
+                #     # add ingredients
+                #     doc.add_heading("Ingredients:")
+                #     for ingredient in recipe['ingredientLines']:
+                #         doc.add_paragraph(ingredient)
+                response_filename = 'Recipes.docx'
+                doc.save(response_filename)
 
         print("Goodbye!")
         break
