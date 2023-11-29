@@ -207,16 +207,17 @@ while True:
 
                 for idx in range(len(integer_list)):
                     new_data["hits"].append(selected_data["hits"][integer_list[idx] - 1])
-
                 break
+
             else:
                 print(f"\033[1m\033[91mPlease select less recipes or make sure every selection is valid.\033[0m")
 
     ask_another_recipe = input("Would you like to search for another recipe? (Yes or No)\n")
     if ask_another_recipe.lower() == "y" or ask_another_recipe.lower() == "yes":
         continue
+
     else:
-        print("*******Processing Request, Please Wait*******")
+        print("*******Processing Request, Please Wait...*******")
         reply = my_session.send_data(new_data)
         print("Received reply from microservice: ", reply, '\r\n')
         my_session.end_send()
