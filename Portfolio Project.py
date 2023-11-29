@@ -278,7 +278,29 @@ while True:
                     break
 
                 elif ask_what_store == "2":
-                    #TODO add storage for shopping list here
+                    # create new document
+                    doc = Document()
+
+                    # add heading
+                    doc.add_heading("Ingredients List")
+
+                    # add each recipe to document
+                    for recipe_info in modified_data[0]:
+                        for result_number, recipe_details in recipe_info.items():
+                            # doc.add_paragraph(f"Recipe Name: {result_number}")
+                            # doc.add_paragraph(f"Recipe Title: {recipe_details['recipe']['label']}")
+                            # doc.add_paragraph(f"URL: {recipe_details['recipe']['url']}")
+
+                            # add ingredients as bulleted list
+                            # doc.add_paragraph(f"Ingredients: ")
+                            for ingredient in recipe_details['recipe']['ingredientLines']:
+                                paragraph = doc.add_paragraph(f"{ingredient}")
+                                # paragraph.style = 'List Bullet'
+
+                            # doc.add_paragraph("\n")
+
+                    response_filename = 'Ingredients List.docx'
+                    doc.save(response_filename)
                     break
 
                 elif ask_what_store == "3":
