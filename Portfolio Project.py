@@ -61,6 +61,31 @@ def process_food_list(input_string):
     formatted_string = remove_str_chars(request_string, 6)
     return formatted_string
 
+def create_recipe_document(modified_data):
+    # create new document
+    doc = Document()
+
+    # add heading
+    doc.add_heading("Saved Recipes")
+
+    # add each recipe to document
+    for recipe_info in modified_data[0]:
+        for result_number, recipe_details in recipe_info.items():
+            # doc.add_paragraph(f"Recipe Name: {result_number}")
+            doc.add_paragraph(f"Recipe Title: {recipe_details['recipe']['label']}")
+            doc.add_paragraph(f"URL: {recipe_details['recipe']['url']}")
+
+            # add ingredients as bulleted list
+            doc.add_paragraph(f"Ingredients: ")
+            for ingredient in recipe_details['recipe']['ingredientLines']:
+                paragraph = doc.add_paragraph(f"{ingredient}")
+                paragraph.style = 'List Bullet'
+
+            doc.add_paragraph("\n")
+
+    response_filename = 'Recipes.docx'
+    doc.save(response_filename)
+
 user_input = input().lower()
 if user_input == "yes" or user_input == "y":
     print("This is a program that will take in 5 inputs from a user to help you find a recipe.")
@@ -248,30 +273,8 @@ while True:
                 print("Enter 0 to exit.")
                 ask_what_store = input("What would you like to store?\n")
                 if ask_what_store == "1":
-
-                    # create new document
-                    doc = Document()
-
-                    # add heading
-                    doc.add_heading("Saved Recipes")
-
-                    # add each recipe to document
-                    for recipe_data in modified_data[0]:
-                        for recipe_name, recipe_details in recipe_data.items():
-                            # doc.add_paragraph(f"Recipe Name: {recipe_name}")
-                            doc.add_paragraph(f"Recipe Title: {recipe_details['recipe']['label']}")
-                            doc.add_paragraph(f"URL: {recipe_details['recipe']['url']}")
-
-                            # add ingredients as bulleted list
-                            doc.add_paragraph(f"Ingredients: ")
-                            for ingredient in recipe_details['recipe']['ingredientLines']:
-                                paragraph = doc.add_paragraph(f"{ingredient}")
-                                paragraph.style = 'List Bullet'
-
-                            doc.add_paragraph("\n")
-
-                    response_filename = 'Recipes.docx'
-                    doc.save(response_filename)
+                    # function to print out the saved recipe in a Word document
+                    create_recipe_document(modified_data)
                     break
 
                 elif ask_what_store == "2":
@@ -286,7 +289,7 @@ while True:
                     break
 
                 else:
-                    print(f"\033[1m\033[91mPlease select 1, 2, or 3.\033[0m")
+                    print(f"\033[1m\033[91mPlease select 1, 2, 3, or 0 to exit.\033[0m")
                     continue
 
         print("Goodbye!")
