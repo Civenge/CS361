@@ -203,7 +203,7 @@ while True:
             # verifies save choices are within range and selection isn't greater than recipe count
             if len(integer_list) <= num_recipes and int(max(integer_list)) <= num_recipes:
                 print(f"Here is what you selected: {integer_list}\n")
-                print("Adding recipes to saved recipes\n")
+                print("******* Adding recipes to saved recipes... *******\n")
 
                 for idx in range(len(integer_list)):
                     new_data["hits"].append(selected_data["hits"][integer_list[idx] - 1])
@@ -217,7 +217,7 @@ while True:
         continue
 
     else:
-        print("*******Processing Request, Please Wait...*******")
+        print("******* Processing Request, Please Wait... *******")
         reply = my_session.send_data(new_data)
         print("Received reply from microservice: ", reply, '\r\n')
         my_session.end_send()
@@ -233,36 +233,61 @@ while True:
 
         # finally, close the TCP connection
         my_session.disconnect()
-        ask_word_doc = input("Would you like the recipes in a Word Document?\n")
-        if ask_word_doc.lower() == "yes" or ask_word_doc.lower() == "y":
 
-            # verify data exits
-            if modified_data[0]:
+        # prompt for storing recipes
+        ask_store_recipes = input("Would you like the saved recipes in a Word Document?\n")
+        if ask_store_recipes.lower() == "yes" or ask_store_recipes.lower() == "y":
 
-                # create new document
-                doc = Document()
+            storing_recipes = True
+            while storing_recipes is True:
 
-                # add heading
-                doc.add_heading("Saved Recipes")
+                # prompt for what to store
+                print("Enter 1 for recipes only.")
+                print("Enter 2 for a shopping list only.")
+                print("Enter 3 for both.")
+                print("Enter 0 to exit.")
+                ask_what_store = input("What would you like to store?\n")
+                if ask_what_store == "1":
 
-                # add each recipe to document
-                for recipe_data in modified_data[0]:
-                    for recipe_name, recipe_details in recipe_data.items():
-                        doc.add_paragraph(f"Recipe Name: {recipe_name}")
-                        doc.add_paragraph(f"Recipe Title: {recipe_details['recipe']['label']}")
-                        doc.add_paragraph(f"URL: {recipe_details['recipe']['url']}")
-                        # doc.add_paragraph(f"Ingredients: {recipe_details['recipe']['ingredientLines']}")
+                    # create new document
+                    doc = Document()
 
-                        # add ingredients as bulleted list
-                        doc.add_paragraph(f"Ingredients: ")
-                        for ingredient in recipe_details['recipe']['ingredientLines']:
-                            paragraph = doc.add_paragraph(f"{ingredient}")
-                            paragraph.style = 'List Bullet'
+                    # add heading
+                    doc.add_heading("Saved Recipes")
 
-                        doc.add_paragraph("\n")
+                    # add each recipe to document
+                    for recipe_data in modified_data[0]:
+                        for recipe_name, recipe_details in recipe_data.items():
+                            # doc.add_paragraph(f"Recipe Name: {recipe_name}")
+                            doc.add_paragraph(f"Recipe Title: {recipe_details['recipe']['label']}")
+                            doc.add_paragraph(f"URL: {recipe_details['recipe']['url']}")
 
-                response_filename = 'Recipes.docx'
-                doc.save(response_filename)
+                            # add ingredients as bulleted list
+                            doc.add_paragraph(f"Ingredients: ")
+                            for ingredient in recipe_details['recipe']['ingredientLines']:
+                                paragraph = doc.add_paragraph(f"{ingredient}")
+                                paragraph.style = 'List Bullet'
+
+                            doc.add_paragraph("\n")
+
+                    response_filename = 'Recipes.docx'
+                    doc.save(response_filename)
+                    break
+
+                elif ask_what_store == "2":
+                    #TODO add storage for shopping list here
+                    break
+
+                elif ask_what_store == "3":
+                    #TODO add storage for both here
+                    break
+
+                elif ask_what_store == "0":
+                    break
+
+                else:
+                    print(f"\033[1m\033[91mPlease select 1, 2, or 3.\033[0m")
+                    continue
 
         print("Goodbye!")
         break
