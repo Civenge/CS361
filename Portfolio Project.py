@@ -6,9 +6,10 @@ import webbrowser
 from send_and_receive import TcpConnect
 from docx import Document
 
-#api here: https://developer.edamam.com//admin/applications/1409623863337
-#api doc: https://developer.edamam.com/edamam-docs-recipe-api
-#requires installation of art via "pip install art" in console
+# api here: https://developer.edamam.com//admin/applications/1409623863337
+# api doc: https://developer.edamam.com/edamam-docs-recipe-api
+# requires installation of art via "pip install art" in console
+# requires installation of docx via "pip install python-docx" in console
 # -----------------------------------------------------------------------------------------------------------------
 # SETUP TCP CONNECTION WITH TCPCONNECT CLASS
 server_name = 'localhost'
@@ -23,11 +24,12 @@ Flow:
     Ask if they want an explanation
     Ask for ingredients, give example format
     Ask for # of recipes, 1 - 20
-    Display results (names only?)
-    Have user pick recipe (by name or maybe list #?)
+    Display results
+    Have user pick recipe(s) 
     Display ingredients for recipe
-    Ask user if they want another recipe (not happy)
-    Need error handling at each step
+    Ask to save recipe(s)
+    Ask user if they want another recipe
+    Ask to save recipe in Word
 '''
 tprint("Meal Planner")
 # unicode is for italics and green
@@ -40,6 +42,7 @@ print("* Would you like more information about this program prior to starting th
 # global to store recipes
 new_data = {"hits": []}
 
+
 def argument_handler(*args):
     if not args:
         return "You need to provide at least 1 argument."
@@ -47,11 +50,13 @@ def argument_handler(*args):
     else:
         return list(args)
 
+
 def remove_str_chars(input_string, x):
     if x >= 0:
         return input_string[:-x]
     else:
         return input_string
+
 
 def process_food_list(input_string):
     request_string = ""
@@ -60,6 +65,7 @@ def process_food_list(input_string):
     # remove the last %2c%20 from the collated string which is unicode for ", "
     formatted_string = remove_str_chars(request_string, 6)
     return formatted_string
+
 
 def create_recipe_document(modified_data):
     # create new document
@@ -86,6 +92,7 @@ def create_recipe_document(modified_data):
     response_filename = 'Recipes.docx'
     doc.save(response_filename)
 
+
 def create_ingredients_document(modified_data):
     # create new document
     doc = Document()
@@ -97,10 +104,11 @@ def create_ingredients_document(modified_data):
     for recipe_info in modified_data[0]:
         for result_number, recipe_details in recipe_info.items():
             for ingredient in recipe_details['recipe']['ingredientLines']:
-                paragraph = doc.add_paragraph(f"{ingredient}")
+                doc.add_paragraph(f"{ingredient}")
 
     response_filename = 'Ingredients List.docx'
     doc.save(response_filename)
+
 
 user_input = input().lower()
 if user_input == "yes" or user_input == "y":
@@ -152,7 +160,6 @@ while True:
             print("Please select at least one ingredient.\n")
     # print(food_list)
 
-
     num_recipes = None
     while num_recipes is None:
         recipe_count = input("How many recipes would you like to view? (1 to 20)\n")
@@ -163,7 +170,6 @@ while True:
         print(f"\033[1m\033[91mPlease pick a number between 1 and 20.\033[0m\n")
         recipe_count = ""
         num_recipes = None
-
 
     formatted_string = process_food_list(food_list)
 
@@ -177,7 +183,7 @@ while True:
         excluded_ingredients_str = ""
 
     # build string for api call
-    response = requests.get("https://api.edamam.com/api/recipes/v2?type=public&q=" + formatted_string + "&app_id=2286dd85&app_key=1cdfcd395ccf99e349b18f54eaa4416f&"+ excluded_ingredients_str +"&random=true&field=url&field=label&field=ingredientLines")
+    response = requests.get("https://api.edamam.com/api/recipes/v2?type=public&q=" + formatted_string + "&app_id=2286dd85&app_key=1cdfcd395ccf99e349b18f54eaa4416f&" + excluded_ingredients_str + "&random=true&field=url&field=label&field=ingredientLines")
 
     if response.status_code == 200:
         # parse the json
@@ -200,8 +206,6 @@ while True:
 
             print(f"Recipe{i}: {recipe_name}")
             print(f"Url: {recipe_url}")
-            # for j, ingredient in enumerate(ingredients, start=1):
-                # print(f"  Ingredient{j}: {ingredient}")
             for ingredient in ingredients:
                 print(f"  {ingredient}")
 
