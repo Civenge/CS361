@@ -111,16 +111,14 @@ if user_input == "yes" or user_input == "y":
     print("Then you can choose which recipe results you want to save based on the displayed recipe number.")
     print("Finally, you will have the option to do another search and save even more recipes, or get the results")
     print("  to download as a word document.")
-    print("Let's get started!")
-
-print("\n")
+    print("Let's get started!\n")
 
 browse_recipes = input("Would you like to search for recipes or browse for recipes? Type 'search' or 'browse'\n").lower()
 if browse_recipes.lower() == "browse" or browse_recipes.lower() == "b":
     url = "https://www.allrecipes.com/"
     webbrowser.open(url)
+    # sends dummy JSON
     reply = my_session.send_data(new_data)
-    # print("Received reply from microservice: ", reply, '\r\n')
     my_session.end_send()
     # -----------------------------------------------------------------------------------------------------------------
     # REQUEST MODIFIED DATA
@@ -128,9 +126,6 @@ if browse_recipes.lower() == "browse" or browse_recipes.lower() == "b":
     modified_data = my_session.get_mod_data()
 
     # -----------------------------------------------------------------------------------------------------------------
-    # CLOSE SOCKET AND PRINT OUT RESULTS FOR USER
-    # print('Received all recipes list:', '\r\n', modified_data[0], '\r\n')
-    # print('Received all ingredients list:', '\r\n', modified_data[1])
 
     # finally, close the TCP connection
     my_session.disconnect()
@@ -310,7 +305,7 @@ while True:
                     break
 
                 else:
-                    print(f"\033[1m\033[91mPlease select 1, 2, 3, or 0 to exit.\033[0m")
+                    print(f"\033[1m\033[91mPlease enter 1, 2, 3, or type 0 to exit.\033[0m")
                     continue
 
         print("Goodbye!")
