@@ -51,9 +51,9 @@ def argument_handler(*args):
         return list(args)
 
 
-def remove_str_chars(input_string, x):
-    if x >= 0:
-        return input_string[:-x]
+def remove_str_chars(input_string, num):
+    if num >= 0:
+        return input_string[:-num]
     else:
         return input_string
 
@@ -63,11 +63,11 @@ def process_food_list(input_string):
     for food in input_string:
         request_string = request_string + food + "%2c%20"
     # remove the last %2c%20 from the collated string which is unicode for ", "
-    formatted_string = remove_str_chars(request_string, 6)
-    return formatted_string
+    api_string = remove_str_chars(request_string, 6)
+    return api_string
 
 
-def create_recipe_document(modified_data):
+def create_recipe_document(recipe_list):
     # create new document
     doc = Document()
 
@@ -75,7 +75,7 @@ def create_recipe_document(modified_data):
     doc.add_heading("Saved Recipes")
 
     # add each recipe to document
-    for recipe_info in modified_data[0]:
+    for recipe_info in recipe_list[0]:
         for result_number, recipe_details in recipe_info.items():
             # doc.add_paragraph(f"Recipe Name: {result_number}")
             doc.add_paragraph(f"Recipe Title: {recipe_details['recipe']['label']}")
@@ -83,8 +83,8 @@ def create_recipe_document(modified_data):
 
             # add ingredients as bulleted list
             doc.add_paragraph(f"Ingredients: ")
-            for ingredient in recipe_details['recipe']['ingredientLines']:
-                paragraph = doc.add_paragraph(f"{ingredient}")
+            for each_ingredient in recipe_details['recipe']['ingredientLines']:
+                paragraph = doc.add_paragraph(f"{each_ingredient}")
                 paragraph.style = 'List Bullet'
 
             doc.add_paragraph("\n")
@@ -93,7 +93,7 @@ def create_recipe_document(modified_data):
     doc.save(response_filename)
 
 
-def create_ingredients_document(modified_data):
+def create_ingredients_document(formatted_data):
     # create new document
     doc = Document()
 
@@ -101,10 +101,10 @@ def create_ingredients_document(modified_data):
     doc.add_heading("Ingredients List")
 
     # add each recipe to document
-    for recipe_info in modified_data[0]:
+    for recipe_info in formatted_data[0]:
         for result_number, recipe_details in recipe_info.items():
-            for ingredient in recipe_details['recipe']['ingredientLines']:
-                doc.add_paragraph(f"{ingredient}")
+            for recipe_ingredient in recipe_details['recipe']['ingredientLines']:
+                doc.add_paragraph(f"{recipe_ingredient}")
 
     response_filename = 'Ingredients List.docx'
     doc.save(response_filename)
@@ -121,7 +121,8 @@ if user_input == "yes" or user_input == "y":
     print("  to download as a word document.")
     print("Let's get started!\n")
 
-browse_recipes = input("Would you like to search for recipes or browse for recipes? Type 'search' or 'browse'\n").lower()
+browse_recipes = input(
+    'Would you like to search for recipes or browse for recipes? Type \'search\' or \'browse\'\n').lower()
 if browse_recipes.lower() == "browse" or browse_recipes.lower() == "b":
     url = "https://www.allrecipes.com/"
     webbrowser.open(url)
@@ -151,7 +152,10 @@ while True:
         if ingredients:
             food_list = argument_handler(ingredients)
             formatted_string = process_food_list(food_list)
-            test_response = requests.get("https://api.edamam.com/api/recipes/v2?type=public&q=" + formatted_string + "&app_id=2286dd85&app_key=1cdfcd395ccf99e349b18f54eaa4416f&random=true&field=url&field=label&field=ingredientLines")
+            test_response = requests.get(
+                "https://api.edamam.com/api/recipes/v2?type=public&q=" + formatted_string +
+                "&app_id=2286dd85&app_key=1cdfcd395ccf99e349b18f54eaa4416f&random=true&field=url&field=label"
+                "&field=ingredientLines")
             dict_from_json = json.loads(test_response.text)
             if not dict_from_json["hits"]:
                 print(f"\033[1m\033[91mYour search for {ingredients} found no recipes, please try again.\033[0m")
@@ -173,7 +177,8 @@ while True:
 
     formatted_string = process_food_list(food_list)
 
-    excluded_ingredients_str = input("Please type out any ingredients you want excluded from the list (rice, bread), or press Enter to skip.\n")
+    excluded_ingredients_str = input(
+        "Please type out any ingredients you want excluded from the list (rice, bread), or press Enter to skip.\n")
     excluded_ingredients_list = argument_handler(excluded_ingredients_str)
 
     if excluded_ingredients_list:
@@ -183,7 +188,9 @@ while True:
         excluded_ingredients_str = ""
 
     # build string for api call
-    response = requests.get("https://api.edamam.com/api/recipes/v2?type=public&q=" + formatted_string + "&app_id=2286dd85&app_key=1cdfcd395ccf99e349b18f54eaa4416f&" + excluded_ingredients_str + "&random=true&field=url&field=label&field=ingredientLines")
+    response = requests.get("https://api.edamam.com/api/recipes/v2?type=public&q=" + formatted_string +
+                            "&app_id=2286dd85&app_key=1cdfcd395ccf99e349b18f54eaa4416f&" + excluded_ingredients_str +
+                            "&random=true&field=url&field=label&field=ingredientLines")
 
     if response.status_code == 200:
         # parse the json
@@ -237,7 +244,8 @@ while True:
 
             # check for negative inputs
             if int(min(integer_list)) <= 0:
-                print(f"\033[1m\033[91mPlease select more than 0 recipes and make sure every selection is valid.\033[0m")
+                print(
+                    f"\033[1m\033[91mPlease select more than 0 recipes and make sure every selection is valid.\033[0m")
                 continue
 
             # verifies save choices are within range and selection isn't greater than recipe count
