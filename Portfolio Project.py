@@ -6,10 +6,26 @@ import webbrowser
 from send_and_receive import TcpConnect
 from docx import Document
 
-# api here: https://developer.edamam.com//admin/applications/1409623863337
-# api doc: https://developer.edamam.com/edamam-docs-recipe-api
-# requires installation of art via "pip install art" in console
-# requires installation of docx via "pip install python-docx" in console
+"""
+This project uses the edamam API to obtain recipes, with the API information below:
+    api here: https://developer.edamam.com//admin/applications/1409623863337
+    api doc: https://developer.edamam.com/edamam-docs-recipe-api
+    
+Requires installation of art via "pip install art" in console.
+Requires installation of docx via "pip install python-docx" in console.
+
+Program Flow:
+    Ask if user wants an explanation
+    Ask for search or browse
+    Ask for ingredients to include, give example format
+    Ask for # of recipes, 1 - 20
+    Ask for ingredients to exclude, give example format    
+    Display recipe results    
+    Ask to save recipe(s)
+    Have user pick recipe(s) 
+    Ask user if they want to search again for another recipe
+    Ask to save recipe/ingredients in Word
+"""
 # -----------------------------------------------------------------------------------------------------------------
 # SETUP TCP CONNECTION WITH TCPCONNECT CLASS
 server_name = 'localhost'
@@ -19,19 +35,7 @@ my_session = TcpConnect('User', server_name, server_port)
 my_session.connect()
 
 # -----------------------------------------------------------------------------------------------------------------
-'''
-Flow:
-    Ask if they want an explanation
-    Ask for search or browse
-    Ask for ingredients to include, give example format
-    Ask for # of recipes, 1 - 20
-    Ask for ingredients to exclude, give example format    
-    Display results    
-    Ask to save recipe(s)
-    Have user pick recipe(s) 
-    Ask user if they want to search again for another recipe
-    Ask to save recipe/ingredients in Word
-'''
+
 tprint("Meal Planner")
 # unicode is for italics and green
 print("\033[3m\033[92mThis program will take approximately 30 seconds to complete for a single recipe.\033[0m")
@@ -47,7 +51,6 @@ new_data = {"hits": []}
 def argument_handler(*args):
     if not args:
         return "You need to provide at least 1 argument."
-
     else:
         return list(args)
 
@@ -59,9 +62,9 @@ def remove_str_chars(input_string, num):
         return input_string
 
 
-def process_food_list(input_string):
+def process_food_list(input_list):
     request_string = ""
-    for food in input_string:
+    for food in input_list:
         request_string = request_string + food + "%2c%20"
     # remove the last %2c%20 from the collated string which is unicode for ", "
     api_string = remove_str_chars(request_string, 6)
@@ -71,14 +74,12 @@ def process_food_list(input_string):
 def create_recipe_document(recipe_list):
     # create new document
     doc = Document()
-
     # add heading
     doc.add_heading("Saved Recipes")
 
     # add each recipe to document
     for recipe_info in recipe_list[0]:
         for result_number, recipe_details in recipe_info.items():
-            # doc.add_paragraph(f"Recipe Name: {result_number}")
             title_paragraph = doc.add_paragraph()
             runner = title_paragraph.add_run(f"Recipe Title: {recipe_details['recipe']['label']}")
             runner.bold = True
@@ -99,7 +100,6 @@ def create_recipe_document(recipe_list):
 def create_ingredients_document(formatted_data):
     # create new document
     doc = Document()
-
     # add heading
     doc.add_heading("Ingredients List")
 
@@ -129,21 +129,20 @@ browse_recipes = input(
 if browse_recipes.lower() == "browse" or browse_recipes.lower() == "b":
     url = "https://www.allrecipes.com/"
     webbrowser.open(url)
-    # sends dummy JSON
+
+    # sends dummy JSON so microservice will end elegantly
     reply = my_session.send_data(new_data)
     my_session.end_send()
-    # -----------------------------------------------------------------------------------------------------------------
-    # REQUEST MODIFIED DATA
-    # (will be in form of list, 1st index is total recipes, 2nd is just ingredients)
-    modified_data = my_session.get_mod_data()
 
-    # -----------------------------------------------------------------------------------------------------------------
+    # obtain data from microservice
+    modified_data = my_session.get_mod_data()
 
     # finally, close the TCP connection
     my_session.disconnect()
     print("Enjoy your browsing, goodbye!")
     exit(0)
 
+# create variables to store ingredients and saved recipes between loop runs
 ingredients = None
 selected_data = None
 
@@ -165,7 +164,6 @@ while True:
                 food_list = None
         else:
             print("Please select at least one ingredient.\n")
-    # print(food_list)
 
     num_recipes = None
     while num_recipes is None:
@@ -198,7 +196,6 @@ while True:
     if response.status_code == 200:
         # parse the json
         dict_from_json = json.loads(response.text)
-        # print(dict_from_json["hits"]) # used to see the response hash table
         if not dict_from_json["hits"]:
             print(f"\033[1m\033[91mYour search for {ingredients} found no recipes, please try again.\033[0m")
             exit(1)
@@ -268,17 +265,15 @@ while True:
         continue
 
     else:
-        print("******* Processing Request, Please Wait... *******")
+        print("******* Processing Request, Please Wait... *******\n")
         reply = my_session.send_data(new_data)
         print("Received reply from microservice: ", reply, '\r\n')
         my_session.end_send()
-        # -----------------------------------------------------------------------------------------------------------------
-        # REQUEST MODIFIED DATA
-        # (will be in form of list, 1st index is total recipes, 2nd is just ingredients)
+
+        # obtain data from microservice
         modified_data = my_session.get_mod_data()
 
-        # -----------------------------------------------------------------------------------------------------------------
-        # CLOSE SOCKET AND PRINT OUT RESULTS FOR USER
+        # close socket and print results
         print('Received all recipes list:', '\r\n', modified_data[0], '\r\n')
         print('Received all ingredients list:', '\r\n', modified_data[1])
 
