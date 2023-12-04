@@ -281,7 +281,7 @@ while True:
         my_session.disconnect()
 
         # prompt for storing recipes
-        ask_store_recipes = input("Would you like the saved recipes in a Word Document?\n")
+        ask_store_recipes = input("Would you like the saved recipes in a Word Document? (Yes or No)\n")
         if ask_store_recipes.lower() == "yes" or ask_store_recipes.lower() == "y":
 
             storing_recipes = True
