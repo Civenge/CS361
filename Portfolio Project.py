@@ -22,14 +22,15 @@ my_session.connect()
 '''
 Flow:
     Ask if they want an explanation
-    Ask for ingredients, give example format
+    Ask for search or browse
+    Ask for ingredients to include, give example format
     Ask for # of recipes, 1 - 20
-    Display results
-    Have user pick recipe(s) 
-    Display ingredients for recipe
+    Ask for ingredients to exclude, give example format    
+    Display results    
     Ask to save recipe(s)
-    Ask user if they want another recipe
-    Ask to save recipe in Word
+    Have user pick recipe(s) 
+    Ask user if they want to search again for another recipe
+    Ask to save recipe/ingredients in Word
 '''
 tprint("Meal Planner")
 # unicode is for italics and green
@@ -78,14 +79,16 @@ def create_recipe_document(recipe_list):
     for recipe_info in recipe_list[0]:
         for result_number, recipe_details in recipe_info.items():
             # doc.add_paragraph(f"Recipe Name: {result_number}")
-            doc.add_paragraph(f"Recipe Title: {recipe_details['recipe']['label']}")
+            title_paragraph = doc.add_paragraph()
+            runner = title_paragraph.add_run(f"Recipe Title: {recipe_details['recipe']['label']}")
+            runner.bold = True
             doc.add_paragraph(f"URL: {recipe_details['recipe']['url']}")
 
             # add ingredients as bulleted list
             doc.add_paragraph(f"Ingredients: ")
             for each_ingredient in recipe_details['recipe']['ingredientLines']:
-                paragraph = doc.add_paragraph(f"{each_ingredient}")
-                paragraph.style = 'List Bullet'
+                ingredient_paragraph = doc.add_paragraph(f"{each_ingredient}")
+                ingredient_paragraph.style = 'List Bullet'
 
             doc.add_paragraph("\n")
 
