@@ -76,8 +76,8 @@ while True:
         # save figure as image
         image_path = 'bar_chart.png'
         plt.savefig(image_path)
-        plt.show()
-        plt.close()
+        # plt.show()
+        # plt.close()
 
         # create word document
         doc = Document()
@@ -101,6 +101,8 @@ while True:
 
         # close connection
         client_socket.close()
+        break
+
     except Exception as e:
         print(f"Error processing message: {e}")
     finally:
